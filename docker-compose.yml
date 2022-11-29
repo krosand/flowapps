@@ -1,29 +1,87 @@
-version: "3"
+version: "3.3"
+
 services:
-database:
-image: mysql
-restart: always
-environment:
-MYSQL_ROOT_PASSWORD: wppassword
-MYSQL_DATABASE: wpdb
-MYSQL_USER: wpuser
-MYSQL_PASSWORD: wppassword
-volumes:
-- mysql:/var/lib/mysql
- 
-wordpress:
-depends_on:
-- database
-image: wordpress:latest
-restart: always
-ports:
-- "8021:80"
-environment:
-WORDPRESS_DB_HOST: database:3306
-WORDPRESS_DB_USER: wpuser
-WORDPRESS_DB_PASSWORD: wppassword
-WORDPRESS_DB_NAME: wpdb
- 
-volumes:
-["./:/var/www/html"]
-volumes:
+
+  traefik:
+    image: "traefik:v2.2"
+    container_name: "traefik"
+    command:
+      - "--api=true"
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+        
+        # Entrypoints 
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.mqtt.address=:8883"
+      
+        # Redirect http to https
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      
+        # Let's encrypt configuration
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=krosand@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8883:8883"
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    labels:
+      - "traefik.enable=true"
+      
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.flow.apps`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=test:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/,test2:$$apr1$$d9hr9HBB$$4HxwgUir3HP4EsggP/QNo0"
+
+  whoami:
+    image: "containous/whoami"
+    container_name: "simple-service"
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.whoami.rule=Host(`whoami.flow.apps`)"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
+  
+  mqtt:
+    image: "eclipse-mosquitto"
+    container_name: "mosquitto"
+    expose:
+      - "8883"
+      - "9001"
+    volumes:
+      - "./mosquitto.conf:/mosquitto/config/mosquitto.conf"
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.mqtt.rule=Host(`mqtt.flow.apps`)"
+      - "traefik.http.routers.mqtt.entrypoints=websecure"
+      - "traefik.http.routers.mqtt.tls.certresolver=myresolver"
+
+      - "traefik.tcp.routers.mqtt.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.mqtt.tls.certresolver=myresolver"
+      - "traefik.tcp.services.mqtt.loadbalancer.server.port=8883"
+      
+      - "traefik.tcp.routers.mqtt.entrypoints=mqtt"
+
+      - "traefik.http.services.mqtt.loadbalancer.server.port=9001"
+
+  nodered:
+    image: "nodered/node-red"
+    container_name: "nodered"
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.nodered.rule=Host(`nodered.flow.apps`)"
+      - "traefik.http.routers.nodered.entrypoints=websecure"
+      - "traefik.http.routers.nodered.tls.certresolver=myresolver"
+
+      - "traefik.http.services.nodered.loadbalancer.server.port=1880"
