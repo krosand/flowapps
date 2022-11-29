@@ -1,87 +1,25 @@
-version: "3.3"
-
+version: "3"
 services:
-
-  traefik:
-    image: "traefik:v2.2"
-    container_name: "traefik"
-    command:
-      - "--api=true"
-      - "--api.dashboard=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-        
-        # Entrypoints 
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.mqtt.address=:8883"
-      
-        # Redirect http to https
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-      
-        # Let's encrypt configuration
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=krosand@gmail.com"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+  app:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
-      - "8883:8883"
+      # These ports are in format <host-port>:<container-port>
+      - '80:80' # Public HTTP Port
+      - '443:443' # Public HTTPS Port
+      - '81:81' # Admin Web Port
+      # Add any other Stream port you want to expose
+      # - '21:21' # FTP
+
+    # Uncomment the next line if you uncomment anything in the section
+    # environment:
+      # Uncomment this if you want to change the location of 
+      # the SQLite DB file within the container
+      # DB_SQLITE_FILE: "/data/database.sqlite"
+
+      # Uncomment this if IPv6 is not enabled on your host
+      # DISABLE_IPV6: 'true'
+
     volumes:
-      - "./letsencrypt:/letsencrypt"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    labels:
-      - "traefik.enable=true"
-      
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.flow.apps`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
-      - "traefik.http.routers.dashboard.entrypoints=websecure"
-      - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.dashboard.tls.certresolver=myresolver"
-      - "traefik.http.routers.dashboard.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=test:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/,test2:$$apr1$$d9hr9HBB$$4HxwgUir3HP4EsggP/QNo0"
-
-  whoami:
-    image: "containous/whoami"
-    container_name: "simple-service"
-    labels:
-      - "traefik.enable=true"
-
-      - "traefik.http.routers.whoami.rule=Host(`whoami.flow.apps`)"
-      - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
-  
-  mqtt:
-    image: "eclipse-mosquitto"
-    container_name: "mosquitto"
-    expose:
-      - "8883"
-      - "9001"
-    volumes:
-      - "./mosquitto.conf:/mosquitto/config/mosquitto.conf"
-    labels:
-      - "traefik.enable=true"
-
-      - "traefik.http.routers.mqtt.rule=Host(`mqtt.flow.apps`)"
-      - "traefik.http.routers.mqtt.entrypoints=websecure"
-      - "traefik.http.routers.mqtt.tls.certresolver=myresolver"
-
-      - "traefik.tcp.routers.mqtt.rule=HostSNI(`*`)"
-      - "traefik.tcp.routers.mqtt.tls.certresolver=myresolver"
-      - "traefik.tcp.services.mqtt.loadbalancer.server.port=8883"
-      
-      - "traefik.tcp.routers.mqtt.entrypoints=mqtt"
-
-      - "traefik.http.services.mqtt.loadbalancer.server.port=9001"
-
-  nodered:
-    image: "nodered/node-red"
-    container_name: "nodered"
-    labels:
-      - "traefik.enable=true"
-
-      - "traefik.http.routers.nodered.rule=Host(`nodered.flow.apps`)"
-      - "traefik.http.routers.nodered.entrypoints=websecure"
-      - "traefik.http.routers.nodered.tls.certresolver=myresolver"
-
-      - "traefik.http.services.nodered.loadbalancer.server.port=1880"
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
