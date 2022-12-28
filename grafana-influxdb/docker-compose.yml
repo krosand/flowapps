@@ -10,6 +10,10 @@ services:
     environment:
       - USER_UID=1000
       - USER_GID=1000
+    volumes:
+      - /mnt/containers/gitea/container-data/data:/data
+      - /etc/timezone:/etc/timezone
+      - /etc/localtime:/etc/localtime
     restart: unless-stopped
     networks:
       - supervision-nw
@@ -18,7 +22,9 @@ services:
     image: influxdb:latest
     container_name: influxdb
     volumes:
-      - ./influxdb:/var/lib/influxdb
+      - /mnt/containers/gitea/container-data/data:/data
+      - /etc/timezone:/etc/timezone
+      - /etc/localtime:/etc/localtime
     ports:
       - "8086:8086"
     environment:
