@@ -1,0 +1,37 @@
+version: '3'
+services:
+  mosquitto-prod:
+    image: eclipse-mosquitto:2.0.15
+    container_name: mosquitto-prod
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - /mnt/containers/mosquitto/container-data/data:/data
+      - /etc/timezone:/etc/timezone
+      - /etc/localtime:/etc/localtime
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    
+    restart: unless-stopped
+  node-red:
+    image: nodered/node-red:2.2.3-12
+    container_name: nodered-prod
+    volumes:
+      - /mnt/containers/nodered/container-data/data:/data
+      - /etc/timezone:/etc/timezone
+      - /etc/localtime:/etc/localtime
+    ports:
+      - "1880:1880"
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    restart: unless-stopped
+    depends_on:
+      - mosquitto-prod
+    networks:
+      - reverseproxy-nw
+networks:
+  reverseproxy-nw:
+    external: true
