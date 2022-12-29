@@ -19,6 +19,7 @@ services:
     image: nodered/node-red:2.2.3-12
     container_name: nodered-prod
     volumes:
+      - /mnt/containers/nodered/container-data/data:/data/settings.js
       - /mnt/containers/nodered/container-data/data:/data
       - /etc/timezone:/etc/timezone
       - /etc/localtime:/etc/localtime
