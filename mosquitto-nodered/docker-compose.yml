@@ -20,7 +20,7 @@ services:
     container_name: nodered-prod
     volumes:
       - ./settings.js:/mnt/containers/nodered/container-data/data/settings.js
-      - ./node-red.env:/mnt/containers/nodered/container-data/data/node-red.env
+      #- ./node-red.env:/mnt/containers/nodered/container-data/data/node-red.env
       - /mnt/containers/nodered/container-data/data:/data
       - /etc/timezone:/etc/timezone
       - /etc/localtime:/etc/localtime
@@ -29,8 +29,8 @@ services:
     environment:
       - USER_UID=1000
       - USER_GID=1000
-    env_file:
-      ./node-red.env
+    #env_file:
+     # ./node-red.env
     restart: unless-stopped
     depends_on:
       - mosquitto-prod
