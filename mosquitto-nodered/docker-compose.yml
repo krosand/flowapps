@@ -29,7 +29,7 @@ services:
       - USER_UID=1000
       - USER_GID=1000
     env_file:
-      - ./node-red.env
+      - /mnt/containers/nodered/container-data/data:/data/node-red.env
     restart: unless-stopped
     depends_on:
       - mosquitto-prod
