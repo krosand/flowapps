@@ -33,6 +33,9 @@ services:
      # ./node-red.env
     restart: unless-stopped
     depends_on:
+      - mosquitto-prod
+    networks:
+      - reverseproxy-nw
 networks:
   reverseproxy-nw:
     external: true
