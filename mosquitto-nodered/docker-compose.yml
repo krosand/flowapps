@@ -11,7 +11,7 @@ services:
       - /mnt/containers/mosquitto/config:/mosquitto/config
       - /mnt/containers/mosquitto/data:/mosquitto/data
       - /mnt/containers/mosquitto/log:/mosquitto/log
-      - mosquitto.conf:/mnt/containers/mosquitto/config/mosquitto.conf
+      - ./mosquitto.conf:/mnt/containers/mosquitto/config/mosquitto.conf
       - /etc/timezone:/etc/timezone
       - /etc/localtime:/etc/localtime
     environment:
