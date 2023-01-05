@@ -13,8 +13,8 @@ services:
       - /mnt/containers/mosquitto/config:/mosquitto/config
       - /mnt/containers/mosquitto/data:/mosquitto/data
       - /mnt/containers/mosquitto/log:/mosquitto/log
-      - /mnt/containers/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
-      - /mnt/containers/mosquitto/data/passwords.txt:/mosquitto/data/passwords.txt
+      #- /mnt/containers/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      #- /mnt/containers/mosquitto/data/passwords.txt:/mosquitto/data/passwords.txt
       - /etc/timezone:/etc/timezone
       - /etc/localtime:/etc/localtime
     restart: unless-stopped
