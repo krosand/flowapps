@@ -7,7 +7,9 @@ services:
       - "1883:1883"
       - "9001:9001"
     volumes:
-      - /mnt/containers/mosquitto/container-data/data:/data
+      - /mnt/containers/mosquitto:/mosquitto
+      - /mnt/containers/mosquitto/data:/mosquitto/data
+      - /mnt/containers/mosquitto/log:/mosquitto/log
       - /etc/timezone:/etc/timezone
       - /etc/localtime:/etc/localtime
     environment:
@@ -19,9 +21,7 @@ services:
     image: nodered/node-red:2.2.3-12
     container_name: nodered-prod
     volumes:
-      - ./settings.js:/mnt/containers/nodered/container-data/data/settings.js
-      #- ./node-red.env:/mnt/containers/nodered/container-data/data/node-red.env
-      - /mnt/containers/nodered/container-data/data:/data
+      /mnt/containers/nodered/data/settings.js
       - /etc/timezone:/etc/timezone
       - /etc/localtime:/etc/localtime
     ports:
