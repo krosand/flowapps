@@ -32,7 +32,7 @@ services:
       - /etc/timezone:/etc/timezone
       - /etc/localtime:/etc/localtime
     environment:
-      - NODE_RED_CREDENTIAL_SECRET=KEY
+      - NODE_RED_CREDENTIAL_SECRET="$2b$08$YkII2fmzgWbNiouH84MuzOqz9P2fJyJTzDzgPLMMrRoI.vK1sqhA6"
     ports:
       - "1880:1880"
     #env_file:
