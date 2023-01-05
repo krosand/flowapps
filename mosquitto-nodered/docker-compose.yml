@@ -21,6 +21,7 @@ services:
   node-red:
     image: nodered/node-red:2.2.3-12
     container_name: nodered-prod
+    user: "${UID}:${GID}"
     environment:
       - USER_UID=1000
       - USER_GID=1000
