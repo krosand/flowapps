@@ -21,7 +21,7 @@ services:
     image: nodered/node-red:2.2.3-12
     container_name: nodered-prod
     volumes:
-      /mnt/containers/nodered/data:/data
+      - /mnt/containers/nodered/data:/data
       - /etc/timezone:/etc/timezone
       - /etc/localtime:/etc/localtime
     ports:
