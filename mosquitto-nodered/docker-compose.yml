@@ -13,7 +13,8 @@ services:
       - /mnt/containers/mosquitto/config:/mosquitto/config
       - /mnt/containers/mosquitto/data:/mosquitto/data
       - /mnt/containers/mosquitto/log:/mosquitto/log
-      - ./mosquitto.conf:/mnt/containers/mosquitto/config/mosquitto.conf
+      - /mnt/containers/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - /mnt/containers/mosquitto/data/passwords.txt:/mosquitto/data/passwords.txt
       - /etc/timezone:/etc/timezone
       - /etc/localtime:/etc/localtime
     restart: unless-stopped
@@ -25,6 +26,7 @@ services:
       - USER_GID=1000
     volumes:
       - /mnt/containers/nodered/data:/data
+      - /mnt/containers/nodered/data/settings.js:/data
       - /etc/timezone:/etc/timezone
       - /etc/localtime:/etc/localtime
     ports:
