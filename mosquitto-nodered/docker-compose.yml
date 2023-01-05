@@ -6,66 +6,33 @@ services:
     ports:
       - "1883:1883"
       - "9001:9001"
-    volumes:
-      - type: bind
-        source: /mnt/containers/mosquitto
-        target: /mosquitto
-        read_only: false
-        bind:
-          uid: 1000
-          gid: 1000
-      - type: bind
-        source: /mnt/containers/mosquitto/config
-        target: /mosquitto/config
-        read_only: false
-        bind:
-          uid: 1000
-          gid: 1000
-      - type: bind
-        source: /mnt/containers/mosquitto/data
-        target: /mosquitto/data
-        read_only: false
-        bind:
-          uid: 1000
-          gid: 1000
-      - type: bind
-        source: /mnt/containers/mosquitto/log
-        target: /mosquitto/log
-        read_only: false
-        bind:
-          uid: 1000
-          gid: 1000
-      - /etc/timezone:/etc/timezone
-      - /etc/localtime:/etc/localtime
     environment:
       - USER_UID=1000
       - USER_GID=1000
-    
+    volumes:
+      - /mnt/containers/mosquitto/config:/mosquitto/config
+      - /mnt/containers/mosquitto/data:/mosquitto/data
+      - /mnt/containers/mosquitto/log:/mosquitto/log
+      - ./mosquitto.conf:/mnt/containers/mosquitto/config/mosquitto.conf
+      - /etc/timezone:/etc/timezone
+      - /etc/localtime:/etc/localtime
     restart: unless-stopped
-  
   node-red:
     image: nodered/node-red:2.2.3-12
     container_name: nodered-prod
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
     volumes:
-      - type: bind
-        source: /mnt/containers/nodered/data
-        target: /data
-        read_only: false
-        bind:
-          uid: 1000
-          gid: 1000
+      - /mnt/containers/nodered/data:/data
       - /etc/timezone:/etc/timezone
       - /etc/localtime:/etc/localtime
     ports:
       - "1880:1880"
-    environment:
-      - USER_UID=1000
-      - USER_GID=1000
+    #env_file:
+     # ./node-red.env
     restart: unless-stopped
     depends_on:
-      - mosquitto-prod
-    networks:
-      - reverseproxy-nw
 networks:
   reverseproxy-nw:
     external: true
