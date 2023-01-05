@@ -20,7 +20,7 @@ services:
       - /etc/localtime:/etc/localtime
     restart: unless-stopped
   node-red:
-    image: nodered/node-red:3.0.2
+    image: nodered/node-red:3.0.2-18
     container_name: nodered-prod
     user: "${UID}:${GID}"
     environment:
