@@ -31,6 +31,8 @@ services:
       - /mnt/containers/nodered/data/settings.js:/data
       - /etc/timezone:/etc/timezone
       - /etc/localtime:/etc/localtime
+    environment:
+      - NODE_RED_CREDENTIAL_SECRET=KEY
     ports:
       - "1880:1880"
     #env_file:
