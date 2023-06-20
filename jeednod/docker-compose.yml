@@ -1,0 +1,118 @@
+﻿version: '3.8'
+
+networks:
+  default:
+    name: jeedom_network
+
+services:
+  db:
+    image: mariadb
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-password}
+      - TZ=${TIME_ZONE:-Europe/Paris}
+      - MYSQL_DATABASE=${MYSQL_JEEDOM_DB:-jeedom}
+      - MYSQL_USER=${MYSQL_JEEDOM_USER:-jeedom}
+      - MYSQL_PASSWD=${MYSQL_JEEDOM_PASSWD:-jeedom}
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-password}"]
+      interval: 1m30s
+      retries: 3
+      start_period: 40s
+      timeout: 20s
+    volumes:
+      # database filesystem
+      - ./volumes/db:/var/lib/mysql
+      # directory for init sql and scripts
+      - ./volumes/sql:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+    labels:
+      # label chadburn for the "cron" container
+      chadburn.enabled: "true"
+      chadburn.job-exec.jeedom-backup.schedule: "@every 1d"
+      chadburn.job-exec.jeedom-backup.command: "mysqldump -d${MYSQL_JEEDOM_DB:-jeedom} -u${MYSQL_JEEDOM_USER:-jeedom} -p\"${MYSQL_JEEDOM_PASSWD:-jeedom}\"' > /backup/jeedom.sql"
+
+
+  jeedom:
+    image: pifou25/jeedom:light
+    hostname: jeedom
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-password}
+      - MYSQL_DATABASE=${MYSQL_JEEDOM_DB:-jeedom}
+      - MYSQL_JEEDOM_USER=${MYSQL_JEEDOM_USER:-jeedom}
+      - MYSQL_JEEDOM_PASSWD=${MYSQL_JEEDOM_PASSWD:-jeedom}
+      - JEEDOM_VERSION=${JEEDOM_VERSION:-V4-stable}
+      - MYSQL_HOST=db
+      - TZ=${TIME_ZONE:-Europe/Paris}
+    restart: unless-stopped
+    volumes:
+      - ./volumes/jeedom:/var/www/html
+      - ./volumes/backup:/tmp/backup
+    healthcheck:
+      test: ["CMD-SHELL", "curl -so /tmp/status http://localhost/here.html || exit 1"]
+      interval: 1m30s
+      retries: 3
+      start_period: 40s
+      timeout: 20s
+    ports:
+      - "80:80"
+    labels:
+      # label chadburn for the "cron" container
+      chadburn.enabled: "true"
+      chadburn.job-exec.jeedom-cron.schedule: "@every 1m"
+      chadburn.job-exec.jeedom-cron.command: "/usr/local/bin/php /var/www/html/core/php/jeeCron.php >> /var/www/html/log/cron.log 2>&1"
+      # label for watchtower: don't check
+      com.centurylinklabs.watchtower.enable: "false"
+    depends_on:
+      - db
+      - scheduler
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+
+  # Scheduler Service: mcuadros/ofelia or premoweb/chadburn
+  scheduler:
+    image: premoweb/chadburn
+    environment:
+      - TZ=${TIME_ZONE:-Europe/Paris}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: daemon
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+
+  adminer:
+    image: adminer
+    depends_on:
+      - db
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "1"
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Paris
+    ports:
+      - 8080:8080
+
+
+  # On peux ajouter également Node-red. permettant une gestion de mqtt native
+  node-red:
+    # profiles: ["nodered"]
+    image:  nodered/node-red
+    volumes:
+    - ./volumes/nodered:/data  # remplacer ./volumes par l'emplacement du volume souhaité
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1880"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+      start_period: 10s
