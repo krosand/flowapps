@@ -26,6 +26,7 @@ services:
     environment:
       - USER_UID=1000
       - USER_GID=1000
+      - TZ=Europe/Paris
     volumes:
       - /mnt/containers/nodered/data:/data
       - /mnt/containers/nodered/data/settings.js:/data
@@ -36,8 +37,8 @@ services:
     #env_file:
      # ./node-red.env
     restart: unless-stopped
-    depends_on:
-      - mosquitto-prod
+    #depends_on:
+      #- mosquitto-prod
     networks:
       - reverseproxy-nw
 networks:
