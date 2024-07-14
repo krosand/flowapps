@@ -5,6 +5,7 @@ services:
     container_name: mosquitto-prod
     ports:
       - "1883:1883"
+      - "8883:8883"
       - "9001:9001"
     user: "${UID}:${GID}"
     environment:
