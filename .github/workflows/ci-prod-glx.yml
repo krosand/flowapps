@@ -3,9 +3,9 @@ name: CI/CD Pipeline Prod glx
 on:
   push:
     branches:
-      - main  # Se déclenche sur la branche 'main'
+      - main  # Se déclenche lors des pushes sur la branche 'main'
     tags:
-      - '*'  # Se déclenche lors des pushes de tags
+      - '*'  # Se déclenche également lors des pushes de tags
   pull_request:
     branches:
       - main  # Se déclenche lors des PR vers 'main'
@@ -36,13 +36,10 @@ jobs:
           echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
         fi
 
-    - name: Build and push Docker image for production
+    - name: Build and push Docker image for production with multiple tags
       run: |
         cd gaulix.fr
         docker buildx build --platform linux/amd64,linux/arm64 \
-        -t krosand/pico-glx:${{ env.IMAGE_TAG }} --push .
-
-    - name: Tag and push the 'latest' Docker image
-      run: |
-        docker tag krosand/pico-glx:${{ env.IMAGE_TAG }} krosand/pico-glx:latest
-        docker push krosand/pico-glx:latest
+        -t krosand/pico-glx:${{ env.IMAGE_TAG }} \
+        -t krosand/pico-glx:latest \
+        --push .
