@@ -43,3 +43,11 @@ jobs:
         -t krosand/pico-glx:${{ env.IMAGE_TAG }} \
         -t krosand/pico-glx:preprod \
         --push .
+
+    - name: Verify index.html exists in the Docker image
+      run: |
+        docker pull krosand/pico-glx:${{ env.IMAGE_TAG }}
+        docker create --name temp-container krosand/pico-glx:${{ env.IMAGE_TAG }}
+        docker cp temp-container:/usr/share/nginx/html/index.html ./index.html || (echo "index.html not found!" && exit 1)
+        docker rm temp-container
+      shell: bash
