@@ -3,12 +3,12 @@ name: CI/CD Pipeline Preprod glx
 on:
   push:
     branches:
-      - preprod  # Se déclenche lors des pushes sur la branche 'preprod'
+      - preprod
     tags:
-      - '*'  # Se déclenche également lors des pushes de tags
+      - '*'
   pull_request:
     branches:
-      - preprod  # Se déclenche lors des PR vers 'preprod'
+      - preprod
 
 jobs:
   build-preprod:
@@ -36,13 +36,10 @@ jobs:
           echo "IMAGE_TAG=preprod-${{ github.sha }}" >> $GITHUB_ENV
         fi
 
-    - name: Build and push Docker image for preprod
+    - name: Build and push Docker image with multiple tags
       run: |
         cd gaulix.fr
         docker buildx build --platform linux/amd64,linux/arm64 \
-        -t krosand/pico-glx:${{ env.IMAGE_TAG }} --push .
-
-    - name: Tag and push the 'preprod' Docker image
-      run: |
-        docker tag krosand/pico-glx:${{ env.IMAGE_TAG }} krosand/pico-glx:preprod
-        docker push krosand/pico-glx:preprod
+        -t krosand/pico-glx:${{ env.IMAGE_TAG }} \
+        -t krosand/pico-glx:preprod \
+        --push .
