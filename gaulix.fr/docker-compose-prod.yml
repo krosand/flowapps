@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  web:
+    image: krosand/pico-glx:latest
+    container_name: prod_gaulix.fr
+    ports:
+      - "8080:80"
+    restart: always
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    volumes:
+      - /mnt/containers/gaulix.fr/data:/usr/share/nginx/html  # Volume pour la production
+    networks:
+      - reverseproxy-nw
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  reverseproxy-nw:
+    external: true
