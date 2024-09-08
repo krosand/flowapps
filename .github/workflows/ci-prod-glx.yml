@@ -4,12 +4,11 @@ on:
   push:
     branches:
       - main  # Se déclenche sur la branche 'main'
+    tags:
+      - '*'  # Se déclenche également lors des pushes de tags
   pull_request:
     branches:
       - main  # Se déclenche lors des PR vers 'main'
-  tag:
-    branches:
-      - '*'  # Se déclenche lors des tags
 
 jobs:
   build-prod:
@@ -31,7 +30,7 @@ jobs:
     - name: Set the Docker image version
       id: version
       run: |
-        if [ ! -z "${{ github.ref_type }}" ] && [ "${{ github.ref_type }}" == "tag" ]; then
+        if [[ "${{ github.ref }}" == refs/tags/* ]]; then
           echo "IMAGE_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
         else
           echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
