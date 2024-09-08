@@ -3,7 +3,13 @@ name: CI/CD Pipeline Preprod glx
 on:
   push:
     branches:
-      - preprod
+      - preprod  # Se déclenche lors des pushes sur la branche 'preprod'
+  pull_request:
+    branches:
+      - preprod  # Se déclenche lors des PR vers 'preprod'
+  tag:
+    branches:
+      - '*'  # Se déclenche lors des tags
 
 jobs:
   build-preprod:
@@ -22,8 +28,17 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
+    - name: Set the Docker image version
+      id: version
+      run: |
+        if [ ! -z "${{ github.ref_type }}" ] && [ "${{ github.ref_type }}" == "tag" ]; then
+          echo "IMAGE_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
+        else
+          echo "IMAGE_TAG=preprod-${{ github.sha }}" >> $GITHUB_ENV
+        fi
+
     - name: Build and push Docker image for preprod
       run: |
         cd gaulix.fr
         docker buildx build --platform linux/amd64,linux/arm64 \
-        -t krosand/pico-glx:preprod-${{ github.sha }} --push .
+        -t krosand/pico-glx:${{ env.IMAGE_TAG }} --push .

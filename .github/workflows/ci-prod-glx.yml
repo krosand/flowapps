@@ -3,7 +3,14 @@ name: CI/CD Pipeline Prod glx
 on:
   push:
     branches:
-      - main
+      - main  # Se déclenche sur la branche 'main'
+  pull_request:
+    branches:
+      - main  # Se déclenche lors des PR vers 'main'
+  tag:
+    branches:
+      - '*'  # Se déclenche lors des tags
+
 jobs:
   build-prod:
     runs-on: ubuntu-latest
@@ -21,13 +28,22 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
+    - name: Set the Docker image version
+      id: version
+      run: |
+        if [ ! -z "${{ github.ref_type }}" ] && [ "${{ github.ref_type }}" == "tag" ]; then
+          echo "IMAGE_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
+        else
+          echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
+        fi
+
     - name: Build and push Docker image for production
       run: |
-        cd gaulix.fr 
+        cd gaulix.fr
         docker buildx build --platform linux/amd64,linux/arm64 \
-        -t krosand/pico-glx:${{ github.sha }} --push .
+        -t krosand/pico-glx:${{ env.IMAGE_TAG }} --push .
 
     - name: Tag and push the 'latest' Docker image
       run: |
-        docker tag krosand/pico-glx:${{ github.sha }} krosand/pico-glx:latest
+        docker tag krosand/pico-glx:${{ env.IMAGE_TAG }} krosand/pico-glx:latest
         docker push krosand/pico-glx:latest
