@@ -30,6 +30,7 @@ jobs:
 
     - name: Push Docker image to DockerHub
       run: |
+        cd gaulix.fr
         docker push krosand/pico-glx:${{ github.sha }}
         docker tag krosand/pico-glx:${{ github.sha }} krosand/pico-glx:latest
         docker push krosand/pico-glx:latest
