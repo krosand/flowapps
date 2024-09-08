@@ -4,12 +4,11 @@ on:
   push:
     branches:
       - preprod  # Se déclenche lors des pushes sur la branche 'preprod'
+    tags:
+      - '*'  # Se déclenche également lors des pushes de tags
   pull_request:
     branches:
       - preprod  # Se déclenche lors des PR vers 'preprod'
-  tag:
-    branches:
-      - '*'  # Se déclenche lors des tags
 
 jobs:
   build-preprod:
