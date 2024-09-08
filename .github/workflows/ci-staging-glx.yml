@@ -1,4 +1,4 @@
-name: CI/CD Pipeline Preprod glx
+name: CI/CD Pipeline pp glx
 
 on:
   push:
