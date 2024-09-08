@@ -1,4 +1,4 @@
-name: CI/CD Pipeline pp glx
+name: CI/CD Pipeline Preprod glx
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
     - name: Set the Docker image version
       id: version
       run: |
-        if [ ! -z "${{ github.ref_type }}" ] && [ "${{ github.ref_type }}" == "tag" ]; then
+        if [[ "${{ github.ref }}" == refs/tags/* ]]; then
           echo "IMAGE_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
         else
           echo "IMAGE_TAG=preprod-${{ github.sha }}" >> $GITHUB_ENV
@@ -41,3 +41,8 @@ jobs:
         cd gaulix.fr
         docker buildx build --platform linux/amd64,linux/arm64 \
         -t krosand/pico-glx:${{ env.IMAGE_TAG }} --push .
+
+    - name: Tag and push the 'preprod' Docker image
+      run: |
+        docker tag krosand/pico-glx:${{ env.IMAGE_TAG }} krosand/pico-glx:preprod
+        docker push krosand/pico-glx:preprod

@@ -5,7 +5,7 @@ on:
     branches:
       - main  # Se déclenche sur la branche 'main'
     tags:
-      - '*'  # Se déclenche également lors des pushes de tags
+      - '*'  # Se déclenche lors des pushes de tags
   pull_request:
     branches:
       - main  # Se déclenche lors des PR vers 'main'
