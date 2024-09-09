@@ -3,9 +3,9 @@ version: '3'
 services:
   web:
     image: krosand/pico-glx:preprod
-    container_name: pp_gaulix.fr
+    container_name: pp-gaulix-fr
     ports:
-      - "8080:80"  
+      - "8080:8080"  
     restart: always
     environment:
       - USER_UID=1000
