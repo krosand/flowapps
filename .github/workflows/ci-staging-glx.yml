@@ -40,7 +40,7 @@ jobs:
       run: |
         cd gaulix.fr
         docker buildx build --platform linux/amd64,linux/arm64 \
-        -t krosand/wwww-glx:${{ env.IMAGE_TAG }} \
+        -t krosand/www-glx:${{ env.IMAGE_TAG }} \
         -t krosand/www-glx:preprod \
         --push .
 
@@ -51,3 +51,13 @@ jobs:
         docker cp temp-container:/usr/share/nginx/html/index.html ./index.html || (echo "index.html not found!" && exit 1)
         docker rm temp-container
       shell: bash
+
+    - name: Delete image from DockerHub on failure
+      if: failure()  # Cette étape s'exécute uniquement si une étape précédente échoue
+      run: |
+        echo "Pipeline failed, deleting image from DockerHub..."
+        docker rmi krosand/www-glx:${{ env.IMAGE_TAG }}
+        docker rmi krosand/www-glx:preprod
+        docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
+        docker image rm krosand/www-glx:${{ env.IMAGE_TAG }} || true
+        docker image rm krosand/www-glx:preprod || true
