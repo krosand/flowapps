@@ -3,12 +3,12 @@ name: CI/CD Pipeline Prod glx
 on:
   push:
     branches:
-      - main  # Se déclenche lors des pushes sur la branche 'main'
+      - main
     tags:
-      - '*'  # Se déclenche également lors des pushes de tags
+      - '*'
   pull_request:
     branches:
-      - main  # Se déclenche lors des PR vers 'main'
+      - main
 
 jobs:
   build-prod:
