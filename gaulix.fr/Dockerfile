@@ -2,7 +2,7 @@
 FROM nginx:alpine
 
 # Copier les fichiers du site dans le répertoire de Nginx
-COPY ./src /usr/share/nginx/html
+COPY ./src/index.html /usr/share/nginx/html/index.html
 
 # Changer le propriétaire des fichiers pour 'nginx'
 RUN chown -R nginx:nginx /usr/share/nginx/html
