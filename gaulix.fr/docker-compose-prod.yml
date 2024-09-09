@@ -2,7 +2,7 @@ version: '3'
 
 services:
   web:
-    image: krosand/pico-glx:latest
+    image: krosand/wwww-glx:latest
     container_name: prod_gaulix.fr
     ports:
       - "8080:80"
