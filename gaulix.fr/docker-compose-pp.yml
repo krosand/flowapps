@@ -5,7 +5,7 @@ services:
     image: krosand/www-glx:preprod
     container_name: pp-gaulix-fr
     ports:
-      - "8080:8080"  
+      - "8080:80"  
     restart: always
     environment:
       - USER_UID=1000
