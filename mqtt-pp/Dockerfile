@@ -1,6 +1,4 @@
 FROM eclipse-mosquitto:2.0-openssl
-
-# Copier la configuration Mosquitto
 COPY mosquitto.conf /mosquitto/config/mosquitto.conf
 
 # Générer des certificats TLS
