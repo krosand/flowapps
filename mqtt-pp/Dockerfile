@@ -1,4 +1,6 @@
 FROM eclipse-mosquitto:2.0-openssl
+RUN apt-get update && apt-get install -y openssl
+
 COPY mosquitto.conf /mosquitto/config/mosquitto.conf
 
 #  Générer des certificats TLS
