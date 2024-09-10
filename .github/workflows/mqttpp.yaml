@@ -5,12 +5,16 @@ on:
     branches:
       - main
       - preprod
+    paths:
+      - "mqtt-pp/**"
     tags:
       - '*'
   pull_request:
     branches:
       - main
       - preprod
+    paths:
+      - "mqtt-pp/**"
 
 jobs:
   build-and-push:

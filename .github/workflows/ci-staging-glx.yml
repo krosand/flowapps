@@ -6,9 +6,13 @@ on:
       - preprod
     tags:
       - '*'
+    paths:
+      - "mqtt-pp/**"
   pull_request:
     branches:
       - preprod
+    paths:
+      - "mqtt-pp/**"  
 
 jobs:
   build-preprod:
