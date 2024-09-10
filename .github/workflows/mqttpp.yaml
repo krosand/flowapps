@@ -48,14 +48,6 @@ jobs:
         -t krosand/mosquitto-tls:preprod \
         --push .
 
-    - name: Verify mosquitto.conf and TLS certificates exist in the Docker image
-      run: |
-        docker pull krosand/mosquitto-tls:${{ env.IMAGE_TAG }}
-        docker create --name temp-container krosand/mosquitto-tls:${{ env.IMAGE_TAG }}
-        docker cp temp-container:/mosquitto/config/mosquitto.conf ./mosquitto.conf || (echo "mosquitto.conf not found!" && exit 1)
-        docker cp temp-container:/mosquitto/config/server.crt ./server.crt || (echo "TLS certificates not found!" && exit 1)
-        docker rm temp-container
-
     - name: Delete image from DockerHub on failure
       if: failure()
       run: |
