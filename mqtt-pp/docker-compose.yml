@@ -1,8 +1,8 @@
 version: '3'
 services:
-  mosquitto-prod:
-    image: eclipse-mosquitto:2.0.18
-    container_name: mosquitto-test
+  mosquitto-pp:
+    image: eclipse-mosquitto:2.0-openssl
+    container_name: mosquitto-pp
     ports:
       - "1883:1883"
       - "8883:8883"
