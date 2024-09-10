@@ -3,15 +3,13 @@ name: CI/CD Pipeline for Mosquitto with TLS
 on:
   push:
     branches:
-      - main
       - preprod
-    paths:
-      - "mqtt-pp/**"
     tags:
       - '*'
+    paths:
+      - "mqtt-pp/**"
   pull_request:
     branches:
-      - main
       - preprod
     paths:
       - "mqtt-pp/**"

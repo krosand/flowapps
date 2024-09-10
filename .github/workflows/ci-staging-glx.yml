@@ -7,12 +7,12 @@ on:
     tags:
       - '*'
     paths:
-      - "mqtt-pp/**"
+      - "gaulix.fr/**"
   pull_request:
     branches:
       - preprod
     paths:
-      - "mqtt-pp/**"  
+      - "gaulix.fr/**"  
 
 jobs:
   build-preprod:
