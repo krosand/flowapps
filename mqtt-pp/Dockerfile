@@ -1,7 +1,7 @@
 FROM eclipse-mosquitto:2.0-openssl
 COPY mosquitto.conf /mosquitto/config/mosquitto.conf
 
-# Générer des certificats TLS
+#  Générer des certificats TLS
 RUN mkdir -p /mosquitto/config && \
     openssl req -new -x509 -days 365 -nodes \
     -out /mosquitto/config/server.crt \
