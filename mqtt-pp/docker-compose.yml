@@ -1,0 +1,24 @@
+version: '3'
+services:
+  mosquitto-prod:
+    image: eclipse-mosquitto:2.0.18
+    container_name: mosquitto-test
+    ports:
+      - "1883:1883"
+      - "8883:8883"
+      - "9001:9001"
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    volumes:
+      - /mnt/containers/pp-mosquitto/config:/mosquitto/config
+      - /mnt/containers/pp-mosquitto/data:/mosquitto/data
+      - /mnt/containers/pp-mosquitto/log:/mosquitto/log
+      - /etc/timezone:/etc/timezone
+      - /etc/localtime:/etc/localtime
+    restart: unless-stopped
+    networks:
+      - reverseproxy-nw
+networks:
+  reverseproxy-nw:
+    external: true
