@@ -44,8 +44,8 @@ jobs:
       run: |
         cd mqtt-pp
         docker buildx build --platform linux/amd64,linux/arm64 \
-        -t krosand/mosquitto-tls:${{ env.IMAGE_TAG }} \
-        -t krosand/mosquitto-tls:preprod \
+        -t krosand/mqtt-glx:${{ env.IMAGE_TAG }} \
+        -t krosand/mqtt-glxs:preprod \
         --push .
 
     - name: Delete image from DockerHub on failure
@@ -53,6 +53,6 @@ jobs:
       run: |
         echo "Pipeline failed, deleting image from DockerHub..."
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-        docker rmi krosand/mosquitto-tls:${{ env.IMAGE_TAG }} || true
-        docker rmi krosand/mosquitto-tls:preprod || true
+        docker rmi krosand/mqtt-glx:${{ env.IMAGE_TAG }} || true
+        docker rmi krosand/mqtt-glx:preprod || true
 
