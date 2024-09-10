@@ -42,8 +42,8 @@ jobs:
 
     - name: Build and push Docker image with multiple tags
       run: |
+        cd mqtt-pp
         docker buildx build --platform linux/amd64,linux/arm64 \
-        -f mqtt-pp/Dockerfile \  # Spécifie le chemin du Dockerfile
         -t krosand/mosquitto-tls:${{ env.IMAGE_TAG }} \
         -t krosand/mosquitto-tls:preprod \
         --push .
